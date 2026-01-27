@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CricxCrate – Live Cricket</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.3/shaka-player.compiled.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+    background: #eef2f7;
+    color: #111827;
+  }
+  
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+  
+  /* CARD */
+  .card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+  }
+  
+  /* HEADER */
+  .header {
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  /* PLAYER CARD */
+  .player-card {
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+  }
+  
+  .player-wrap {
+    position: relative;
+    aspect-ratio: 16/9;
+  }
+  
+  .player-wrap video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* SECTION TITLES */
+  .section-title {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  
+  /* BUTTONS */
+  .btn-row, .share-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  
+  .btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 14px;
+    display: inline-block;
+  }
+  
+  .btn.primary {
+    background: #ff6b6b;
+    color: #fff;
+  }
+  
+  .btn.secondary {
+    background: #fff;
+    color: #ff6b6b;
+    border: 1px solid #ffd1d1;
+  }
+  
+  /* TELEGRAM BANNER */
+  .tg-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .tg-banner img {
+    width: 28px;
+  }
+  
+  /* POPUP - MATCHING IMAGE */
+  .popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+  .popup-box {
+    background: rgba(255,255,255,0.9);
+    padding: 26px 22px;
+    border-radius: 26px;
+    text-align: center;
+    width: 90%;
+    max-width: 340px;
+  }
+
+  .popup-box h2 {
+    margin: 0 0 10px 0;
+  }
+
+  .popup-box p {
+    color: #6b7280;
+    margin-bottom: 20px;
+  }
+  
+  /* Popup Button Alignment Fix */
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .popup-content .btn {
+    width: 100%;
+    margin: 0; /* Remove any default margins */
+  }
+
+</style>
+</head>
+<body>
+
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <h2>Welcome 🤩</h2>
+    <p>Join Telegram for live match updates</p>
+    <div class="popup-content">
+      <a class="btn primary" href="https://t.me/CricxCrate" target="_blank">Join @CricxCrate</a>
+      <button class="btn secondary" onclick="closePopup()">Already Joined</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="card header">CricxCrate • Willow Sports</div>
+
+  <div class="card player-card">
+    <div class="player-wrap">
+      <video id="video" controls autoplay muted playsinline></video>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">⚡ Join Telegram For Live Updates</div>
+    <div class="btn-row">
+      <a class="btn primary" href="https://t.me/CricxCrate" target="_blank">Join Telegram</a>
+      <a class="btn secondary" href="https://t.me/CricxCratelinks" target="_blank">All Channels</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">❤️ Share & Support</div>
+    <div class="share-row">
+      <button class="btn primary">Share</button>
+      <button class="btn secondary">Copy Link</button>
+    </div>
+  </div>
+
+  <a href="https://t.me/CricxCrate" target="_blank" class="card tg-banner">
+    <img src="https://telegram.org/img/t_logo.png">
+    Join @CricxCrate
+  </a>
+</div>
+
+<script>
+/* POPUP LOGIC */
+const popup = document.getElementById("popup");
+function closePopup() {
+  popup.style.display = "none";
+  sessionStorage.setItem("joined", "yes");
+}
+if (sessionStorage.getItem("joined") === "yes") {
+  popup.style.display = "none";
+}
+
+/* SHAKA PLAYER */
+async function initPlayer() {
+  const player = new shaka.Player(document.getElementById("video"));
+  player.configure({
+    drm: {
+      clearKeys: {
+        "48bef83b4c6a3c5189b01b0126210da4": "bd085230b7b09e50954fe0af111a8a9f"
+      }
+    }
+  });
+  try {
+    await player.load("https://ev-fast-mpd.starzplayarabia.com/live/eds/CricLife2/DASH/CricLife2.mpd");
+  } catch (e) {
+    console.error("Load failed", e);
+  }
+}
+document.addEventListener("DOMContentLoaded", initPlayer);
+</script>
+
+</body>
+</html>
